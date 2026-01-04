@@ -1,0 +1,30 @@
+# Build artifacts
+*.o
+*.d
+*.a
+bpgdec
+bpgenc
+bpgview
+*.exe
+
+# Build directories
+build/
+x265.out/
+
+# JavaScript builds
+*.js
+*.wasm
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/

@@ -15,7 +15,7 @@ USE_BPGVIEW=y
 # Enable the cross compilation for Windows
 #CONFIG_WIN32=y
 # Enable for compilation on MacOS X
-#CONFIG_APPLE=y
+CONFIG_APPLE=y
 # Installation prefix
 prefix=/usr/local
 
@@ -41,6 +41,9 @@ PWD:=$(shell pwd)
 CFLAGS:=-Os -Wall -MMD -fno-asynchronous-unwind-tables -fdata-sections -ffunction-sections -fno-math-errno -fno-signed-zeros -fno-tree-vectorize -fomit-frame-pointer
 CFLAGS+=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT
 CFLAGS+=-I.
+CFLAGS+=-I/opt/homebrew/opt/libpng/include/libpng16
+CFLAGS+=-I/opt/homebrew/opt/jpeg/include
+CFLAGS+=-I/opt/homebrew/opt/xz/include
 CFLAGS+=-DCONFIG_BPG_VERSION=\"$(shell cat VERSION)\"
 ifdef USE_JCTVC_HIGH_BIT_DEPTH
 CFLAGS+=-DRExt__HIGH_BIT_DEPTH_SUPPORT
@@ -56,9 +59,10 @@ EMCFLAGS:=$(CFLAGS)
 
 LDFLAGS=-g
 ifdef CONFIG_APPLE
+LDFLAGS+=-L/opt/homebrew/opt/libpng/lib
+LDFLAGS+=-L/opt/homebrew/opt/jpeg/lib
+LDFLAGS+=-L/opt/homebrew/opt/xz/lib
 LDFLAGS+=-Wl,-dead_strip
-else
-LDFLAGS+=-Wl,--gc-sections
 endif
 CFLAGS+=-g
 CXXFLAGS=$(CFLAGS)
@@ -180,7 +184,7 @@ endif # !CONFIG_APPLE
 LIBS+=-lm -lpthread
 
 BPGDEC_LIBS:=-lpng $(LIBS)
-BPGENC_LIBS+=-lpng -ljpeg $(LIBS)
+BPGENC_LIBS+=-lpng -ljpeg -llzma $(LIBS)
 BPGVIEW_LIBS:=-lSDL_image -lSDL $(LIBS)
 
 endif #!CONFIG_WIN32

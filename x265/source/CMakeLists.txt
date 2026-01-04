@@ -1,4 +1,7 @@
 # vim: syntax=cmake
+cmake_minimum_required (VERSION 3.5) # OBJECT libraries require 2.8.8
+project (x265)
+
 if(NOT CMAKE_BUILD_TYPE)
     # default to Release build for GCC builds
     set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -6,18 +9,9 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 message(STATUS "cmake version ${CMAKE_VERSION}")
-if(POLICY CMP0025)
-    cmake_policy(SET CMP0025 OLD) # report Apple's Clang as just Clang
-endif()
 if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW) # MACOSX_RPATH
 endif()
-if(POLICY CMP0054)
-    cmake_policy(SET CMP0054 OLD) # Only interpret if() arguments as variables or keywords when unquoted
-endif()
-
-project (x265)
-cmake_minimum_required (VERSION 2.8.8) # OBJECT libraries require 2.8.8
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
@@ -60,6 +54,10 @@ elseif(${SYSPROC} STREQUAL "armv6l")
     message(STATUS "Detected ARM target processor")
     set(ARM 1)
     add_definitions(-DX265_ARCH_ARM=1 -DHAVE_ARMV6=1)
+elseif(${SYSPROC} STREQUAL "arm64" OR ${SYSPROC} STREQUAL "aarch64")
+    message(STATUS "Detected ARM64 target processor")
+    set(ARM 1)
+    add_definitions(-DX265_ARCH_ARM=1)
 else()
     message(STATUS "CMAKE_SYSTEM_PROCESSOR value `${CMAKE_SYSTEM_PROCESSOR}` is unknown")
     message(STATUS "Please add this value near ${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE}")

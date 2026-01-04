@@ -53,6 +53,78 @@ BPG Image library and utilities
   - Only a 64 bit target is supported because x265 needs it for bit
     depths > 8.
 
+2.3) macOS (Apple Silicon / ARM64)
+-----------------------------------
+
+Building for Apple Silicon (M1/M2/M3 or newer) requires some additional
+setup due to CMake policy compatibility and dependency locations.
+
+Prerequisites:
+  - Xcode Command Line Tools installed (xcode-select --install)
+  - Homebrew installed (https://brew.sh)
+  - Required packages: libpng, libjpeg, xz
+
+Installation of dependencies:
+  ```
+  brew install libpng libjpeg xz cmake
+  ```
+
+Build Instructions:
+
+1) Fix x265 CMake compatibility:
+   The x265 CMakeLists.txt uses deprecated CMake policies. Update
+   x265/source/CMakeLists.txt to support modern CMake:
+   
+   - Move "cmake_minimum_required()" before "project()" call
+   - Update minimum version to 3.5
+   - Remove deprecated policy settings (CMP0025, CMP0054)
+   - Add ARM64 architecture detection
+
+2) Enable macOS build in Makefile:
+   Edit the Makefile and uncomment the CONFIG_APPLE option:
+   ```
+   CONFIG_APPLE=y
+   ```
+
+   Also add Homebrew include/lib paths for dependencies:
+   ```
+   CFLAGS+=-I/opt/homebrew/opt/libpng/include/libpng16
+   CFLAGS+=-I/opt/homebrew/opt/jpeg/include
+   CFLAGS+=-I/opt/homebrew/opt/xz/include
+   
+   LDFLAGS+=-L/opt/homebrew/opt/libpng/lib
+   LDFLAGS+=-L/opt/homebrew/opt/jpeg/lib
+   LDFLAGS+=-L/opt/homebrew/opt/xz/lib
+   ```
+
+3) Build the tools:
+   ```
+   make bpgenc bpgdec
+   ```
+
+4) Install to system:
+   ```
+   sudo install -m 755 bpgenc /usr/local/bin/
+   sudo install -m 755 bpgdec /usr/local/bin/
+   ```
+
+Verification:
+   ```
+   which bpgenc
+   bpgenc -h
+   ```
+
+Example usage:
+   ```
+   bpgenc -q 25 input.png -o output.bpg
+   bpgdec output.bpg -o decoded.png
+   ```
+
+Notes:
+  - The build creates x265 libraries for 8-bit, 10-bit, and 12-bit support
+  - Use 'make -j N' where N is the number of CPU cores for faster compilation
+  - Assembly optimizations are disabled for ARM64 (not required for performance)
+
 3) BPG encoder
 --------------
 
